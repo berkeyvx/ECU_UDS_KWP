@@ -1,0 +1,4 @@
+.idea/
+*.gch
+*.out
+cmake-build-debug/

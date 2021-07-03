@@ -13,7 +13,7 @@ Parser::Parser(std::string &&file_name):file_name_(file_name)
 {
 }
 
-std::vector<sim> Parser::parse()
+std::vector<sim> Parser::parse() const
 {
     std::ifstream file(file_name_);
     std::string id, req, res;
@@ -51,7 +51,7 @@ std::vector<sim> Parser::parse()
     return ret;
 }
 
-std::vector<std::string> Parser::splitBySpace(std::string &str)
+std::vector<std::string> Parser::splitBySpace(std::string &str) const
 {
     char const space_delimiter = ' ';
     std::vector<std::string> words{};

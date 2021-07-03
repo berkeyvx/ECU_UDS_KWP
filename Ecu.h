@@ -7,11 +7,16 @@
 
 #include <cstdint>
 #include <array>
+#include "Parser.h"
+
+namespace {
+    auto constexpr file = "simulation.txt";
+}
 
 class Ecu
 {
 private:
-    std::uint_fast32_t const ecu_id_;
+    std::uint32_t const ecu_id_;
 
 protected:
     struct negative_response_constants{
@@ -19,14 +24,15 @@ protected:
         static std::int16_t const lastByte = 0x31;
     };
     using nrc = negative_response_constants;
+    Parser parser{file};
 
 public:
-    std::array<std::int16_t, 3> constructNegativeResponse(std::uint16_t middleByte);
+    std::vector<std::int16_t> constructNegativeResponse(std::int16_t middleByte) const;
 
 public:
-    explicit Ecu(std::uint_fast32_t ecu_id);
+    explicit Ecu(std::uint32_t ecu_id);
     virtual ~Ecu() = 0;
-    std::uint_fast32_t getEcuId() const;
+    std::uint32_t getEcuId() const;
 };
 
 

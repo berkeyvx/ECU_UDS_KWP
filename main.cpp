@@ -9,71 +9,68 @@ enum class ecu_type
     KWP,
 };
 
-std::vector<std::uint16_t> sendRequest(std::uint_fast16_t const ecuID, std::vector<std::int16_t> const &reqByte)
+void readEcuParameters(std::uint_fast16_t ecuID,
+                       ecu_type ecuType,
+                       std::vector<std::int16_t> const& did);
+
+std::vector<std::int16_t> sendRequest(std::uint_fast16_t const ecuID, std::vector<std::int16_t> const &reqByte)
 {
-    auto resp = std::vector<std::uint16_t>(3);
+    EcuUDS ecu1(1);
+    EcuKWP ecu2(2);
 
+    if(ecuID == 1)
+    {
+        ecu1.setDataIdentifier(reqByte);
+        return ecu1.ReadDataByIdentifier();
+    }
+    else if(ecuID == 2)
+    {
+        ecu2.setDataIdentifier(reqByte);
+        return ecu2.ReadDataByLocalIdentifier();
 
-     Parser p;
-     auto f = p.parse(filename);
-     readEcuParameters(ecuID, ecuType, did)
-
-
-    return resp;
+    }
+    else
+    {
+        throw std::invalid_argument("ECU NOT SUPPORTED YET");
+    }
+    return {};
 }
 
 void readEcuParameters(std::uint_fast16_t ecuID,
                        ecu_type ecuType,
-                       std::vector<std::uint16_t> did)
+                       std::vector<std::int16_t> const& did)
 {
-    EcuUDS uds(1);
-    EcuKWP kwp(2);
-    switch (ecuID)
+    if (ecuType == ecu_type::UDS)
     {
-        case 1:
+        if (did.size() != 2)
+            return;
+        auto resp = sendRequest(ecuID, did);
+        for (auto& res: resp)
         {
-            auto negRes = uds.constructNegativeResponse(0x15);
-            for (auto& i: negRes)
-            {
-                std::cout << std::hex << i;
-            }
-            std::cout << "\n";
-            break;
+            std::cout << std::hex << std::uppercase << res << " ";
         }
-        case 2:
+        std::cout << "\n";
+
+    }
+    else if (ecuType == ecu_type::KWP)
+    {
+        if(did.size() != 1)
+            return;
+        auto resp = sendRequest(ecuID, did);
+        for (auto& res: resp)
         {
-            auto negRes = kwp.constructNegativeResponse(0x15);
-            for (auto& i: negRes)
-            {
-                std::cout << std::hex << i;
-            }
-            std::cout << "\n";
-            break;
+            std::cout << std::hex << std::uppercase << res << " ";
         }
-        default:
-            break;
+        std::cout << "\n";
     }
 }
 
 int main()
 {
-    Parser p("simulation.txt");
-    auto val = p.parse();
-    for (auto&i: val)
-    {
-        std::cout << std::hex << std::uppercase;
-        std::cout << i.id << "\n";
-        for (auto& ii:i.req)
-        {
-            std::cout << ii << " ";
-        }
-        std::cout << "\n";
-        for (auto& ii:i.res)
-        {
-            std::cout << ii << " ";
-        }
-        std::cout << "\n";
-    }
-
+    readEcuParameters(1, ecu_type::UDS, {0x12,0x35}); // should return response
+    readEcuParameters(1, ecu_type::UDS, {0x12,0x36}); // should fail
+    readEcuParameters(2, ecu_type::KWP, {0x12}); // should return response
+    readEcuParameters(2, ecu_type::KWP, {0x13}); // should fail
+    readEcuParameters(3,ecu_type::UDS, {0x11, 0x14}); // should throw invalid_argument
     return 0;
 }

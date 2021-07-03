@@ -3,18 +3,43 @@
 //
 
 #include "EcuKWP.h"
-#include <iostream>
 
-EcuKWP::EcuKWP(std::uint_fast32_t ecu_id): Ecu(ecu_id)
+
+std::int16_t const EcuKWP::readDID = 0x21;
+
+EcuKWP::EcuKWP(std::uint32_t ecu_id): Ecu(ecu_id)
 {
 }
 
-void EcuKWP::test()
+std::vector<std::int16_t> EcuKWP::ReadDataByLocalIdentifier(std::int16_t const& identifier)
 {
-    std::cout << std::hex << EcuKWP::nrc::firstByte << EcuKWP::nrc::lastByte << "\n";
+    auto parsedData = parser.parse();
+    auto present = false;
+    auto saveIter = parsedData.begin();
+    for (auto iter = parsedData.begin(); iter != parsedData.end(); iter++)
+    {
+        if(iter->id != Ecu::getEcuId())
+            continue;
+        for(auto reqIter = iter->req.begin(); reqIter != iter->req.end(); reqIter++)
+        {
+            if(*reqIter == did_)
+            {
+                saveIter = iter;
+                present = true;
+                break;
+            }
+        }
+    }
+    if (!present)
+        return constructNegativeResponse(readDID);
+
+    std::vector<std::int16_t> resp{identifier};
+    std::copy(saveIter->res.begin(), saveIter->res.end(), std::inserter(resp, std::end(resp)));
+
+    return resp;
 }
 
-std::vector<std::int16_t> EcuKWP::readDataByIdentifier()
+void EcuKWP::setDataIdentifier(std::vector<std::int16_t> const & did)
 {
-    return std::vector<std::int16_t>();
+    did_ = did[0];
 }

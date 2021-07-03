@@ -13,13 +13,16 @@
 class EcuUDS: public Ecu
 {
 private:
-    std::uint16_t readDID = 0x22;
+    static std::int16_t const readDID;
+    std::int16_t did0_ = -1;
+    std::int16_t did1_ = -1;
 
 public:
-    explicit EcuUDS(std::uint_fast32_t ecu_id);
+    explicit EcuUDS(std::uint32_t ecu_id);
     ~EcuUDS() override = default;
 
-    std::vector<std::int16_t> ReadDataByIdentifier(std::int16_t = 0x22) const;
+    std::vector<std::int16_t> ReadDataByIdentifier(std::int16_t const& identifier = 0x22) const;
+    void setDataIdentifier(std::vector<std::int16_t> const &);
 };
 
 

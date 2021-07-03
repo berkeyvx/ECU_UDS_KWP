@@ -10,12 +10,16 @@
 
 class EcuKWP: public Ecu
 {
-public:
-    explicit EcuKWP(std::uint_fast32_t ecu_id);
-    ~EcuKWP() override = default;
-    void test();
+private:
+    static std::int16_t const readDID;
+    std::int16_t did_ = -1;
 
-    std::vector<std::int16_t> readDataByIdentifier();
+public:
+    explicit EcuKWP(std::uint32_t ecu_id);
+    ~EcuKWP() override = default;
+    void setDataIdentifier(std::vector<std::int16_t> const &did);
+
+    std::vector<std::int16_t> ReadDataByLocalIdentifier(std::int16_t const& identifier = readDID);
 };
 
 

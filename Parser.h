@@ -11,7 +11,7 @@
 
 struct sim
 {
-   std::int32_t id;
+   std::uint32_t id;
    std::vector<std::int16_t> req;
    std::vector<std::int16_t> res;
 };
@@ -20,8 +20,8 @@ class Parser
 {
 public:
     explicit Parser(std::string &&file_name);
-    std::vector<sim> parse();
-    std::vector<std::string> splitBySpace(std::string&);
+    std::vector<sim> parse() const;
+    std::vector<std::string> splitBySpace(std::string&) const;
 
 private:
     std::string const file_name_;
