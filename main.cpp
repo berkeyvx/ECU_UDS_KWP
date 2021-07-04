@@ -3,11 +3,13 @@
 #include "EcuKWP.h"
 #include "Parser.h"
 
+namespace{
 enum class ecu_type
 {
     UDS,
     KWP,
 };
+}
 
 void readEcuParameters(std::uint_fast16_t ecuID,
                        ecu_type ecuType,
@@ -68,9 +70,9 @@ void readEcuParameters(std::uint_fast16_t ecuID,
 int main()
 {
     readEcuParameters(1, ecu_type::UDS, {0x12,0x35}); // should return response
-    readEcuParameters(1, ecu_type::UDS, {0x12,0x36}); // should fail
+    readEcuParameters(1, ecu_type::UDS, {0x12,0x36}); // should fail middle byte 22
     readEcuParameters(2, ecu_type::KWP, {0x12}); // should return response
-    readEcuParameters(2, ecu_type::KWP, {0x13}); // should fail
-    readEcuParameters(3,ecu_type::UDS, {0x11, 0x14}); // should throw invalid_argument
+    readEcuParameters(2, ecu_type::KWP, {0x13}); // should fail middle byte 21
+    //readEcuParameters(3,ecu_type::UDS, {0x11, 0x14}); // should throw invalid_argument
     return 0;
 }
